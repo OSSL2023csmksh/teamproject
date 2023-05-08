@@ -1,6 +1,4 @@
 
-# teamproject
-
 # mini project 주제
  - 야구선수 스탯 레퍼런스 만들기
 
