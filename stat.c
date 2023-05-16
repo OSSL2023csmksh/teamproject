@@ -156,6 +156,9 @@ int loadData(Stat *s[]){
   printf("=> 로딩 성공!\n");
   return i;
 
+
+
+  
 }
 
 
