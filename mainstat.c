@@ -9,7 +9,6 @@ int main(void) {
   Stat *sp[100];
   int index = 0;
 
-
   count = loadData(sp);
   index = count;
 
