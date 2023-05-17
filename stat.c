@@ -137,7 +137,6 @@ void listStatByHR(Stat *s[], int count) {
   printf("\n");
 }
 
-
 int loadData(Stat *s[]){
   int count = 0, i = 0;
   FILE *fp;
