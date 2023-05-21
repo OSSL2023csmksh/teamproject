@@ -56,8 +56,16 @@ int main(void) {
           searchName(sp, index);
       }
       else if (menu == 7) {
-          if(count > 0) listStatByHR(sp, index);
-          else printf("데이터가 없습니다.\n");
+          listStatByHR(sp, index);
+      }
+      else if (menu == 8) {
+          listStatByAVG(sp, index);
+      }
+      else if (menu == 9) {
+          listStatByRBI(sp, index);
+      }
+      else if (menu == 10) {
+          listprMVP(sp, index);
       }
 
     }
