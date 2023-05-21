@@ -13,6 +13,9 @@ int selectMenu() {
   printf("5. 저장\n");
   printf("6. 이름검색\n");
   printf("7. 홈런순위\n");
+  printf("8. 타율순위\n");
+  printf("9. 타점순위\n");
+  printf("10. 예상MVP순위\n");
   printf("0. 종료\n\n");
   printf("=> 원하는 메뉴는? ");
   scanf("%d", &menu);
@@ -22,39 +25,37 @@ int selectMenu() {
 int addStat(Stat *s) {
   printf("이름은? ");
   scanf("%s", s->name);
-  printf("년도는? ");
-  scanf("%d", &s->Year);
   printf("타율은? ");
   scanf("%f", &s->AVG);
   printf("타점은? ");
   scanf("%d", &s->RBI);
   printf("홈런개수는? ");
   scanf("%d", &s->HR);
-  printf("승리기여도는? ");
-  scanf("%f", &s->WAR);
   printf("=> 추가됨!\n\n");
   return 1;
 }
 
 void readStat(Stat s) {
-  printf(" Name    Year    AVG    RBI   HR   WAR\n");
+  printf(" Name  AVG  RBI  HR  \n");
   printf("==============================================\n");
-  printf("%8s   %2d   %2.3f   %2d   %2d   %2.1f\n ", s.name, s.Year, s.AVG, s.RBI, s.HR, s.WAR);
+  printf("%8s    %2.3f   %2d   %2d \n ", s.name, s.AVG, s.RBI, s.HR);
+}
+
+void rankreadStat(Stat s, int rank) {
+  printf(" RANK  Name  AVG  RBI  HR  \n");
+  printf("==============================================\n");
+  printf(" %4d  %8s  %2.3f   %2d   %2d \n ", rank, s.name, s.AVG, s.RBI, s.HR);
 }
 
 int updateStat(Stat *s) {
   printf("이름은? ");
   scanf("%s", s->name);
-  printf("년도는? ");
-  scanf("%d", &s->Year);
   printf("타율은? ");
   scanf("%f", &s->AVG);
   printf("타점은? ");
   scanf("%d", &s->RBI);
   printf("홈런개수는? ");
   scanf("%d", &s->HR);
-  printf("승리기여도는? ");
-  scanf("%f", &s->WAR);
   printf("=> 수정됨!\n");
   return 1;
 }
@@ -76,7 +77,6 @@ int selectDataNo(Stat *s[], int count) {
 }
 
 int deleteStat(Stat *s) {
-  s->Year = -1;
   s->RBI = -1;
   s->HR = -1;
   return 1;
@@ -88,7 +88,7 @@ void saveData(Stat *s[], int count)
   fp = fopen("Stat.txt", "wt");
   for(int i = 0; i < count; i++){
     if(s[i] == NULL) continue;
-    fprintf(fp, "%s %d %f %d %d %f\n",s[i]->name,s[i]->Year,s[i]->AVG,s[i]->RBI,s[i]->HR,s[i]->WAR);      
+    fprintf(fp, "%s %f %d %d \n",s[i]->name,s[i]->AVG,s[i]->RBI,s[i]->HR);      
   fclose(fp);
   printf("=> 저장됨! ");
   }
@@ -101,7 +101,7 @@ void searchName(Stat *s[], int count){
   printf("검색할 이름? ");
   scanf("%s", search);
 
-  printf("\nName  Year  AVG  RBI  HR  WAR\n");
+  printf("\nName  AVG  RBI  HR \n");
   printf("================================\n");
 
   for(int i =0; i <count ; i++){
@@ -131,9 +131,12 @@ void listStatByHR(Stat *s[], int count) {
       }
     }
   }
+  printf("\n*** 홈런 순위 ***\n");
+  printf(" Rank    Name    HR   AVG    RBI\n");
+  printf("=================================\n");
   for (i = 0; i < count; i++) {
     if (sorted[i] == NULL) continue;
-    readStat(*sorted[i]);
+    rankreadStat(*sorted[i], i + 1);
   }
   printf("\n");
 }
@@ -153,12 +156,16 @@ void listStatByAVG(Stat *s[], int count) {
       }
     }
   }
+  printf("\n*** 타율 순위 ***\n");
+  printf(" Rank    Name    HR   AVG    RBI\n");
+  printf("=================================\n");
   for (i = 0; i < count; i++) {
     if (sorted[i] == NULL) continue;
-    readStat(*sorted[i]);
+    rankreadStat(*sorted[i], i + 1);
   }
   printf("\n");
 }
+  
 
 void listStatByRBI(Stat *s[], int count) {
   Stat *sorted[100];
@@ -175,9 +182,12 @@ void listStatByRBI(Stat *s[], int count) {
       }
     }
   }
+  printf("\n*** 타점 순위 ***\n");
+  printf(" Rank    Name    HR   AVG    RBI\n");
+  printf("=================================\n");
   for (i = 0; i < count; i++) {
     if (sorted[i] == NULL) continue;
-    readStat(*sorted[i]);
+    rankreadStat(*sorted[i], i + 1);
   }
   printf("\n");
 }
@@ -194,29 +204,45 @@ int selectDataStat(Stat *s[], int count) {
   return statOption;
 }
 
-int prMVP(Stat *s[], int count) {
-  int mvp[count];
-  for (int i = 0; i < count; i++) {
-    mvp[i] = s[i]->HR * 10 + s[i]->AVG * 100 + s[i]->RBI * 5;
+void listprMVP(Stat *s[], int count) {
+  Stat *sorted[100];
+  int i, j;
+  
+  // Copying the array of pointers to a temporary array
+  for (i = 0; i < count; i++) {
+    sorted[i] = s[i];
   }
-  int maxMVP = mvp[0];
-  int maxIndex = 0;
-  for (int i = 1; i < count; i++) {
-    if (mvp[i] > maxMVP) {
-      maxMVP = mvp[i];
-      maxIndex = i;
+  
+  // Sorting the array in descending order of MVP score
+  for (i = 0; i < count - 1; i++) {
+    for (j = i + 1; j < count; j++) {
+      int score_i = sorted[i]->HR * 10 + sorted[i]->AVG * 100 + sorted[i]->RBI * 5;
+      int score_j = sorted[j]->HR * 10 + sorted[j]->AVG * 100 + sorted[j]->RBI * 5;
+      
+      if (score_i < score_j) {
+        Stat *temp = sorted[i];
+        sorted[i] = sorted[j];
+        sorted[j] = temp;
+      }
     }
   }
-  return maxIndex;
-}
-
-void listprMVP(Stat *s[], int count) {
-  int mvpIndex = prMVP(s, count);
+  
+  // Displaying the top 10 players
   printf("\n*** 예상 MVP 순위 ***\n");
-  printf("1위: ");
-  readStat(*s[mvpIndex]);
+  printf(" Rank    Name    HR   AVG    RBI   MVP Score\n");
+  printf("==============================================\n");
+  
+  int limit = (count < 10) ? count : 10; // Limiting to the available count or 10, whichever is smaller
+  
+  for (i = 0; i < limit; i++) {
+    if (sorted[i] == NULL) continue;
+    int score = sorted[i]->HR * 10 + sorted[i]->AVG * 100 + sorted[i]->RBI * 5;
+    printf("%4d %8s   %2d   %2.3f   %2d   %5d\n", i + 1, sorted[i]->name, sorted[i]->HR, sorted[i]->AVG, sorted[i]->RBI, score);
+  }
+  
   printf("\n");
 }
+
 
 
 int loadData(Stat *s[]){
@@ -227,14 +253,11 @@ int loadData(Stat *s[]){
     s[i] =(Stat *)malloc(sizeof(Stat));
     fscanf(fp, "%s", s[i]->name);
     if(feof(fp)) break;
-    fscanf(fp, "%d", &s[i]->Year);
     fscanf(fp, "%f", &s[i]->AVG);
     fscanf(fp, "%d", &s[i]->RBI);
     fscanf(fp, "%d", &s[i]->HR);
-    fscanf(fp, "%f", &s[i]->WAR);
   }
   fclose(fp);
   printf("=> 로딩 성공!\n");
   return i;
 }
-
