@@ -91,6 +91,7 @@ void saveData(Stat *s[], int count)
     fprintf(fp, "%s %d %f %d %d %f\n",s[i]->name,s[i]->Year,s[i]->AVG,s[i]->RBI,s[i]->HR,s[i]->WAR);      
   fclose(fp);
   printf("=> 저장됨! ");
+  }
 }
 
 void searchName(Stat *s[], int count){
@@ -137,6 +138,87 @@ void listStatByHR(Stat *s[], int count) {
   printf("\n");
 }
 
+void listStatByAVG(Stat *s[], int count) {
+  Stat *sorted[100];
+  int i, j;
+  for (i = 0; i < count; i++) {
+    sorted[i] = s[i];
+  }
+  for (i = 0; i < count - 1; i++) {
+    for (j = i + 1; j < count; j++) {
+      if (sorted[i]->AVG < sorted[j]->AVG) {
+        Stat *temp = sorted[i];
+        sorted[i] = sorted[j];
+        sorted[j] = temp;
+      }
+    }
+  }
+  for (i = 0; i < count; i++) {
+    if (sorted[i] == NULL) continue;
+    readStat(*sorted[i]);
+  }
+  printf("\n");
+}
+
+void listStatByRBI(Stat *s[], int count) {
+  Stat *sorted[100];
+  int i, j;
+  for (i = 0; i < count; i++) {
+    sorted[i] = s[i];
+  }
+  for (i = 0; i < count - 1; i++) {
+    for (j = i + 1; j < count; j++) {
+      if (sorted[i]->RBI < sorted[j]->RBI) {
+        Stat *temp = sorted[i];
+        sorted[i] = sorted[j];
+        sorted[j] = temp;
+      }
+    }
+  }
+  for (i = 0; i < count; i++) {
+    if (sorted[i] == NULL) continue;
+    readStat(*sorted[i]);
+  }
+  printf("\n");
+}
+
+int selectDataStat(Stat *s[], int count) {
+  int statOption;
+  printf("\n*** 선수 성적 순위 ***\n");
+  printf("1. 타율 순위\n");
+  printf("2. 홈런 순위\n");
+  printf("3. 타점 순위\n");
+  printf("0. 취소\n\n");
+  printf("=> 원하는 스탯은? ");
+  scanf("%d", &statOption);
+  return statOption;
+}
+
+int prMVP(Stat *s[], int count) {
+  int mvp[count];
+  for (int i = 0; i < count; i++) {
+    mvp[i] = s[i]->HR * 10 + s[i]->AVG * 100 + s[i]->RBI * 5;
+  }
+  int maxMVP = mvp[0];
+  int maxIndex = 0;
+  for (int i = 1; i < count; i++) {
+    if (mvp[i] > maxMVP) {
+      maxMVP = mvp[i];
+      maxIndex = i;
+    }
+  }
+  return maxIndex;
+}
+
+void listprMVP(Stat *s[], int count) {
+  int mvpIndex = prMVP(s, count);
+  printf("\n*** 예상 MVP 순위 ***\n");
+  printf("1위: ");
+  readStat(*s[mvpIndex]);
+  printf("\n");
+}
+
+
 int loadData(Stat *s[]){
   int count = 0, i = 0;
   FILE *fp;
@@ -154,11 +236,5 @@ int loadData(Stat *s[]){
   fclose(fp);
   printf("=> 로딩 성공!\n");
   return i;
-
-
-
 }
-
-
-
 
